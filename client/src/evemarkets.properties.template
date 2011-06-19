@@ -1,0 +1,8 @@
+# Add your personal key here
+auth.key=
+
+#This is url to check if snapshot file needs to be uploaded to the server.
+check.url=
+
+#This is url to upload data to the server.
+post.url=
