@@ -18,22 +18,33 @@
  */
 package org.shadanakar.eve.markets;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.awt.*;
 
 public class Main {
-    private String folder;
-    private String checkAddress;
-    private String postAddress;
-    private String userKey;
 
     public static void main(String[] args) throws Exception {
-        new Main().run();
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+        } catch (Exception e) {
+            try {
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            } catch (Exception ex) {
+                // and ignore
+            }
+        }
+
+        EmMainWindow window = new EmMainWindow();
+
+        window.main();
     }
 
     private void run() throws URISyntaxException, MalformedURLException {
-        init();
+        // lets open a window..
+/*
         System.out.println("Scanning " + folder);
 
         File marketlogsFolder = new File(folder);
@@ -106,91 +117,6 @@ public class Main {
                 break;
             }
         }
-    }
-
-    private boolean checkSnapshot(URL checkUrl, String itemName, String snapshotTime) throws IOException {
-        String data = "__KEY="+ URLEncoder.encode(userKey, "UTF-8");
-        data += "&item=" + URLEncoder.encode(itemName, "UTF-8");
-        data += "&time=" + URLEncoder.encode(snapshotTime, "UTF-8");
-        HttpURLConnection connection = (HttpURLConnection) checkUrl.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        connection.setRequestProperty("Content-Length", Integer.toString(data.getBytes().length) );
-        connection.setUseCaches (false);
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-        writer.write(data);
-        writer.flush();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String res = reader.readLine();
-        if (res == null) {
-            throw new IOException("Unexpected end of file from " + checkAddress);
-        }
-
-        res = res.trim();
-        if (!"imported".equals(res) && !"send".equals(res)) {
-            String line;
-            while(null != (line = reader.readLine())) {
-                res += "\n" + line;
-            }
-            writer.close();
-            reader.close();
-            throw new RuntimeException("Unexpected reply from the server: " + res);
-        }
-
-        writer.close();
-        reader.close();
-
-        return !"imported".equals(res);
-    }
-
-    private void postData(URL postUrl, String xml) throws IOException {
-        String data = "__KEY="+ URLEncoder.encode(userKey, "UTF-8");
-        data += "&xml=" + URLEncoder.encode(xml, "UTF-8");
-        HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        connection.setRequestProperty("Content-Length", Integer.toString(data.getBytes().length) );
-        connection.setUseCaches (false);
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-        writer.write(data);
-        writer.flush();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String res = reader.readLine();
-        if (res == null) {
-            throw new IOException("Unexpected end of file from " + postAddress);
-        } else {
-            //System.out.println("-- Debug: " + res);
-        }
-
-        writer.close();
-        reader.close();
-    }
-
-    private void init() {
-        String homeDir = System.getenv("HOME");
-        // Windows?
-        if (null == homeDir) {
-            String homeDrive = System.getenv("HOMEDRIVE");
-            String homePath = System.getenv("HOMEPATH");
-            if (homeDrive != null && homePath != null) {
-                homeDir = homeDrive + homePath;
-            }
-        }
-
-        if (homeDir == null) {
-            throw new RuntimeException("Cannot identify the forlder where eve stores markets data import files.");
-        }
-
-        folder = homeDir + File.separator + "Documents" + File.separator +
-                "EVE" + File.separator + "logs" + File.separator + "Marketlogs" + File.separator;
-
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("evemarkets");
-        userKey = resourceBundle.getString("auth.key");
-        checkAddress = resourceBundle.getString("check.url");
-        postAddress = resourceBundle.getString("post.url");
+        */
     }
 }

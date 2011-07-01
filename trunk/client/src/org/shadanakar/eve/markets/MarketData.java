@@ -88,13 +88,13 @@ public class MarketData {
         String itemName;
         String exportDate;
         {
-            String[] tokens = fileName.split("-");
-            if (tokens.length < 3) {
+            int firstDash = fileName.indexOf("-");
+            int lastDash = fileName.lastIndexOf("-");
+            if (firstDash == -1 || lastDash == -1) {
                 throw new RuntimeException("Invalid file name format");
             }
-            int last = tokens.length - 1;
-            String suffix = tokens[last];
-            itemName = tokens[last-1];
+            String suffix = fileName.substring(lastDash+1);
+            itemName = fileName.substring(firstDash+1, lastDash);
             int dotIndex = suffix.lastIndexOf('.');
             if (dotIndex == -1) {
                 throw new RuntimeException("Invalid file name format");
