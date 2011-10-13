@@ -12,6 +12,6 @@ goto runApp
 if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 
 :runApp
-%_JAVACMD% -cp %_ROOT%;evemarketstool.jar org.shadanakar.eve.markets.Main
+%_JAVACMD% -cp %_ROOT%;evemarketstool-commons.jar;evemarketstool-client.jar org.shadanakar.eve.markets.Main
 
  

@@ -16,7 +16,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.shadanakar.eve.markets;
+package org.shadanakar.eve.markets.commons;
 
 import java.util.Comparator;
 import java.math.BigDecimal;

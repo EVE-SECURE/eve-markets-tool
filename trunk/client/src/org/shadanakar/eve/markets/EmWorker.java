@@ -17,6 +17,9 @@
  */
 package org.shadanakar.eve.markets;
 
+import org.shadanakar.eve.markets.commons.MarketData;
+import org.shadanakar.eve.markets.commons.MarketDataFactory;
+
 import java.io.*;
 import java.util.*;
 import java.net.*;
@@ -78,7 +81,7 @@ public class EmWorker implements Runnable {
                         for (String fileName : files) {
                             uiController.setStateProcessing(fileName);
                             try {
-                                MarketData data = MarketData.createFromFile(folder, fileName);
+                                MarketData data = MarketDataFactory.createFromFile(folder, fileName);
                                 marketDataToSend.add(data);
                                 uiController.setStateProcessed(fileName);
                             } catch (FileNotFoundException ex) {
@@ -198,7 +201,7 @@ public class EmWorker implements Runnable {
         if (!"imported".equals(res) && !"send".equals(res)) {
             String line;
             while(null != (line = reader.readLine())) {
-                res += "\n" + line;
+                res += "\n" + line.trim();
             }
             writer.close();
             reader.close();
