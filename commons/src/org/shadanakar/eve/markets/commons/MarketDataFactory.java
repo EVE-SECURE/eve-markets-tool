@@ -1,5 +1,4 @@
 /**
- *  $Id$
  *  Copyright (C) 2011 by Dimitry Ivanov
  *
  *  This program is free software; you can redistribute it and/or
@@ -16,72 +15,29 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.shadanakar.eve.markets;
+package org.shadanakar.eve.markets.commons;
 
-import java.io.*;
-import java.util.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.util.*;
 import java.math.BigDecimal;
 
-public class MarketData {
-    private String fileName;
-    private List<OrderData> buyOrders;
-    private List<OrderData> sellOrders;
-    private String itemName;
-    private String snapshotTime;
-
-    public MarketData(String fileName, String itemName, String exportDate) {
-        this.fileName = fileName;
-        this.itemName = itemName;
-        this.snapshotTime = exportDate;
-        buyOrders = new ArrayList<OrderData>();
-        sellOrders = new ArrayList<OrderData>();
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public String getSnapshotTime() {
-        return snapshotTime;
-    }
-
-    public String toXml() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        sb.append("<market-snapshot>");
-        sb.append("<item>").append(itemName).append("</item>");
-        sb.append("<time>").append(snapshotTime).append("</time>");
-        sb.append("<buy-orders>");
-        for (OrderData buyOrder : buyOrders) {
-            sb
-                    .append("<order>")
-                    .append("<price>").append(buyOrder.getPrice()).append("</price>")
-                    .append("<volume>").append(buyOrder.getVolume()).append("</volume>")
-                    .append("</order>");
-        }
-        sb.append("</buy-orders>");
-        sb.append("<sell-orders>");
-        for (OrderData buyOrder : sellOrders) {
-            sb
-                    .append("<order>")
-                    .append("<price>").append(buyOrder.getPrice()).append("</price>")
-                    .append("<volume>").append(buyOrder.getVolume()).append("</volume>")
-                    .append("</order>");
-        }
-        sb.append("</sell-orders>");
-        sb.append("</market-snapshot>");
-        return sb.toString();
-    }
-
-    private static class Constants {
-        public static final String JITA_4x4_STATION_ID = "60003760";
-    }
+public final class MarketDataFactory {
+    private MarketDataFactory() {} // not constructable...
 
     public static MarketData createFromFile(String folder, String fileName) throws IOException {
         // Lets parse it and get infomration about item and date
@@ -181,16 +137,59 @@ public class MarketData {
         return data;
     }
 
-    private void sort() {
-        Collections.sort(sellOrders, new OrderData.PriceComparatorAscending());
-        Collections.sort(buyOrders, new OrderData.PriceComparatorDescending());
+    public static MarketData createFromXml(final String xml) throws ParserConfigurationException, IOException, SAXException {
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        //Using factory get an instance of document builder
+        DocumentBuilder db = dbf.newDocumentBuilder();
+
+        //parse using builder to get DOM representation of the XML file
+        Document doc = db.parse(new InputSource(new StringReader(xml)));
+
+        Element rootNode = doc.getDocumentElement();
+        // validate node name
+        if (!"market-snapshot".equals(rootNode.getNodeName())) {
+            throw new RuntimeException("Invalid root node: " + rootNode.getNodeName());
+        }
+
+        String name = XmlUtils.getUniqueSubnode(rootNode, "item").getTextContent();
+        String exportDate = XmlUtils.getUniqueSubnode(rootNode, "time").getTextContent(); 
+
+        MarketData result = new MarketData(name, exportDate);
+
+        {
+            Element orders = XmlUtils.getUniqueSubnode(rootNode, "buy-orders");
+            NodeList orderNodes = orders.getElementsByTagName("order");
+
+            for (int i = 0; i<orderNodes.getLength(); ++i) {
+                OrderData orderData = parseOrderXml((Element) orderNodes.item(i), OrderData.Type.buy);
+                result.addBuyOrder(orderData);
+            }
+
+        }
+
+        {
+            Element orders = XmlUtils.getUniqueSubnode(rootNode, "sell-orders");
+            NodeList orderNodes = orders.getElementsByTagName("order");
+
+            for (int i = 0; i<orderNodes.getLength(); ++i) {
+                OrderData orderData = parseOrderXml((Element) orderNodes.item(i), OrderData.Type.sell);
+                result.addSellOrder(orderData);
+            }
+        }
+
+        return result;
     }
 
-    private void addSellOrder(OrderData order) {
-        sellOrders.add(order);
+    private static OrderData parseOrderXml(Element orderElement, OrderData.Type type) {
+        String priceStr = XmlUtils.getUniqueSubnodeTest(orderElement, "price");
+        BigDecimal price = new BigDecimal(priceStr);
+        Long volume = new Long(XmlUtils.getUniqueSubnode(orderElement, "volume").getTextContent());
+        return new OrderData(price, volume, type);
     }
 
-    private void addBuyOrder(OrderData order) {
-        buyOrders.add(order);
+    private static class Constants {
+        public static final String JITA_4x4_STATION_ID = "60003760";
     }
 }

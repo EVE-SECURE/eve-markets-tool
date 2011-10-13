@@ -17,30 +17,43 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <project name="evemarketstool" default="dist" basedir=".">
-    <property name="src.dir" location="src"/>
+    <property name="commons.dir" location="commons"/>
+    <property name="client.dir" location="client"/>
+    <property name="client.src.dir" location="${client.dir}/src"/>
+    <property name="client.scripts.dir" location="${client.dir}/scripts"/>
+    <property name="commons.src.dir" location="${commons.dir}/src"/>
+
     <property name="build.dir" location="build"/>
     <property name="dist.dir" location="dist"/>
-    <property name="scripts.dir" location="scripts"/>
+
 
     <target name="init">
         <tstamp/>
         <mkdir dir="${build.dir}"/>
-    </target>
-
-    <target name="compile" depends="init">
-        <javac srcdir="${src.dir}" destdir="${build.dir}"/>
-    </target>
-
-    <target name="dist" depends="compile">
         <mkdir dir="${dist.dir}"/>
-        <jar jarfile="${dist.dir}/evemarketstool.jar" basedir="build"/>
+    </target>
+
+    <target name="build.commons" depends="init">
+        <mkdir dir="${build.dir}/commons"/>
+        <javac srcdir="${commons.src.dir}" destdir="${build.dir}/commons"/>
+        <jar jarfile="${dist.dir}/evemarketstool-commons.jar" basedir="${build.dir}/commons"/>
+    </target>
+
+    <target name="build.client" depends="build.commons, init">
+        <mkdir dir="${build.dir}/client"/>
+        <javac classpath="${dist.dir}/evemarketstool-commons.jar" srcdir="${client.src.dir}" destdir="${build.dir}/client"/>
+        <jar jarfile="${dist.dir}/evemarketstool-client.jar" basedir="${build.dir}/client"/>
+    </target>
+
+    <target name="dist" depends="build.commons, build.client">
         <jar jarfile="${dist.dir}/evemarketstool-src.jar">
-            <fileset dir="${src.dir}" excludes="evemarkets.properties"/>
+            <fileset dir="${client.src.dir}" excludes="evemarkets.properties"/>
+            <fileset dir="${commons.src.dir}" excludes="evemarkets.properties"/>
         </jar>
         <copy todir="${dist.dir}" file="gpl-2.0.txt"/>
-        <copy todir="${dist.dir}" file="src/evemarkets.properties.template"/>
+        <copy todir="${dist.dir}" file="${client.src.dir}/evemarkets.properties.template"/>
         <copy todir="${dist.dir}">
-            <fileset dir="${scripts.dir}">
+            <fileset dir="${client.scripts.dir}">
                 <include name="*"/>
             </fileset>
         </copy>
