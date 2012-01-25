@@ -70,11 +70,11 @@ public class MarketData {
         }
         sb.append("</buy-orders>");
         sb.append("<sell-orders>");
-        for (OrderData buyOrder : sellOrders) {
+        for (OrderData sellOrder : sellOrders) {
             sb
                     .append("<order>")
-                    .append("<price>").append(buyOrder.getPrice()).append("</price>")
-                    .append("<volume>").append(buyOrder.getVolume()).append("</volume>")
+                    .append("<price>").append(sellOrder.getPrice()).append("</price>")
+                    .append("<volume>").append(sellOrder.getVolume()).append("</volume>")
                     .append("</order>");
         }
         sb.append("</sell-orders>");

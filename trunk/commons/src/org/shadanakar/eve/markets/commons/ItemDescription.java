@@ -19,10 +19,12 @@ package org.shadanakar.eve.markets.commons;
 
 public final class ItemDescription {
     private long id;
+    private long eveId;
     private String name;
 
-    public ItemDescription(long id, String name) {
+    public ItemDescription(long id, long eveId, String name) {
         this.id = id;
+        this.eveId = eveId;
         this.name = name;
     }
 
@@ -32,5 +34,9 @@ public final class ItemDescription {
 
     public String getName() {
         return name;
+    }
+
+    public long getEveId() {
+        return eveId;
     }
 }
