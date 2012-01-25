@@ -17,6 +17,8 @@
  */
 package org.shadanakar.eve.markets;
 
+import com.sun.istack.internal.Nullable;
+
 import javax.swing.*;
 import java.io.*;
 
@@ -61,10 +63,14 @@ public final class EmUIController {
         });
     }
 
-    public void setStateProcessed(String fileName) {
+    public void setStateProcessed(final String message) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                mainWindow.getLogArea().append("done.\n");
+                if (message == null) {
+                    mainWindow.getLogArea().append("done.\n");
+                } else {
+                    mainWindow.getLogArea().append(message +".\n");
+                }
                 JProgressBar progressBar = mainWindow.getProgressBar();
                 progressBar.setValue(progressBar.getValue()+1);
             }
@@ -136,7 +142,7 @@ public final class EmUIController {
         });
     }
 
-    public void setStateSkipped(String fileName) {
+    public void setStateSkipped(final String fileName) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 mainWindow.getLogArea().append("skipped.\n");

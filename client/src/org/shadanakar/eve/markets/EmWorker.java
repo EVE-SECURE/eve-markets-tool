@@ -80,10 +80,17 @@ public class EmWorker implements Runnable {
                     try {
                         for (String fileName : files) {
                             uiController.setStateProcessing(fileName);
+                            // skip file if it is less then 10 seconds old
                             try {
+                                Date now = new Date();
+                                File f = new File(folder + fileName);
+                                if (f.lastModified() > (now.getTime() - 5000)) {
+                                    uiController.setStateProcessed("too recent, skipping");
+                                    continue;
+                                }
                                 MarketData data = MarketDataFactory.createFromFile(folder, fileName);
                                 marketDataToSend.add(data);
-                                uiController.setStateProcessed(fileName);
+                                uiController.setStateProcessed(null);
                             } catch (FileNotFoundException ex) {
                                 uiController.setStateProcessingError(fileName, "File is not found.", ex);
                             } catch (IOException ex) {
