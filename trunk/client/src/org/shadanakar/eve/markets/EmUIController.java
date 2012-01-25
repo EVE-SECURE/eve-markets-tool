@@ -17,8 +17,6 @@
  */
 package org.shadanakar.eve.markets;
 
-import com.sun.istack.internal.Nullable;
-
 import javax.swing.*;
 import java.io.*;
 
