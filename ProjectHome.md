@@ -1,0 +1,1 @@
+Client server application that provides easy (well, as easy as it is humanly possible) tool to import EVE online market data to the server and then use it whenever you pleased as an XML.
